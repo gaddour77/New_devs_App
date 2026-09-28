@@ -55,6 +55,7 @@ async def calculate_total_revenue(property_id: str, tenant_id: str) -> Dict[str,
                         COUNT(*) as reservation_count
                     FROM reservations 
                     WHERE property_id = :property_id AND tenant_id = :tenant_id
+                    AND DATE(check_in_date AT TIME ZONE :timezone) >= :start_date AND DATE(check_in_date AT TIME ZONE :timezone) < :end_date
                     GROUP BY property_id
                 """)
                 
@@ -69,7 +70,7 @@ async def calculate_total_revenue(property_id: str, tenant_id: str) -> Dict[str,
                     return {
                         "property_id": property_id,
                         "tenant_id": tenant_id,
-                        "total": str(total_revenue),
+                        "total": float(total_revenue),
                         "currency": "USD", 
                         "count": row.reservation_count
                     }
